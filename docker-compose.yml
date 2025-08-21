@@ -1,0 +1,79 @@
+networks:
+  wadua-network:
+    driver: bridge
+    name: wadua-network
+
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: wadua-admin
+      POSTGRES_PASSWORD: wadua-admin
+      POSTGRES_DB: wadua
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - wadua-network
+
+  airflow:
+    image: apache/airflow:2.7.3-python3.11
+    restart: on-failure
+    depends_on:
+      - postgres
+    environment:
+
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://wadua-admin:wadua-admin@postgres/wadua
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+      _PIP_ADDITIONAL_REQUIREMENTS: "pandas duckdb"
+
+      AIRFLOW__SMTP__SMTP_HOST: ${SMTP_HOST}
+      AIRFLOW__SMTP__SMTP_STARTTLS: 'True'
+      AIRFLOW__SMTP__SMTP_SSL: 'False'
+      AIRFLOW__SMTP__SMTP_USER: ${SMTP_USER}
+      AIRFLOW__SMTP__SMTP_PASSWORD: ${SMTP_PASSWORD}
+      AIRFLOW__SMTP__SMTP_PORT: '587'
+      AIRFLOW__SMTP__SMTP_MAIL_FROM: ${SMTP_MAIL_FROM}
+
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION}
+
+      
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./data:/opt/airflow/data
+      - ./.env:/opt/airflow/.env
+      - /var/run/docker.sock:/var/run/docker.sock  # <-- ¡Agrega esta línea!
+
+    ports:
+      - "8080:8080"
+    command: >
+      bash -c "
+      airflow db init &&
+      airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@example.com &&
+      airflow webserver & airflow scheduler
+      "
+    networks:
+      - wadua-network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - wadua-network
+
+volumes:
+  postgres_data:
+  pgadmin_data:

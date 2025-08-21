@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Top Productos</h2>
+
+<table class="table table-striped table-bordered">
+  <thead>
+    <tr>
+      <th>Producto</th>
+      <th>Cantidad Vendida</th>
+      <th>Ventas Totales</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in data %}
+    <tr>
+      <td>{{ row.Product_Category_Name }}</td>
+      <td>{{ row.cantidad_vendida }}</td>
+      <td>${{ "{:,.2f}".format(row.ventas_totales|float) }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<canvas id="productosChart"></canvas>
+
+<script>
+  const ctx = document.getElementById('productosChart');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: {{ data | map(attribute='Product_Category_Name') | list | safe }},
+      datasets: [{
+        label: 'Cantidad Vendida',
+        data: {{ data | map(attribute='cantidad_vendida') | list | safe }},
+        backgroundColor: 'rgba(54, 162, 235, 0.6)'
+      }]
+    }
+  });
+</script>
+{% endblock %}

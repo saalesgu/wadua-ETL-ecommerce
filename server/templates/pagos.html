@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Métodos de Pago</h2>
+
+<table class="table table-striped table-bordered">
+  <thead>
+    <tr>
+      <th>Tipo de Pago</th>
+      <th>Cantidad</th>
+      <th>Total Pagado</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in data %}
+    <tr>
+      <td>{{ row.Payment_Type }}</td>
+      <td>{{ row.cantidad }}</td>
+      <td>${{ "{:,.2f}".format(row.total_pagado|float) }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<canvas id="pagosChart"></canvas>
+
+<script>
+  const ctx = document.getElementById('pagosChart');
+  new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: {{ data | map(attribute='Payment_Type') | list | safe }},
+      datasets: [{
+        data: {{ data | map(attribute='cantidad') | list | safe }},
+        backgroundColor: ['#36A2EB', '#FF6384', '#FFCE56', '#4BC0C0', '#9966FF']
+      }]
+    }
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="text-center">
+  <h1 class="mb-4">Dashboard de Ventas</h1>
+  <p>Bienvenido 👋. Selecciona una sección:</p>
+  <div class="d-flex justify-content-center gap-3">
+    <a class="btn btn-primary btn-lg" href="/ventas">📈 Ventas</a>
+    <a class="btn btn-success btn-lg" href="/productos">🛒 Productos</a>
+    <a class="btn btn-warning btn-lg" href="/pagos">💳 Pagos</a>
+  </div>
+</div>
+{% endblock %}

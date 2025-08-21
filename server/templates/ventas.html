@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Ventas por Periodo</h2>
+
+<table class="table table-striped table-bordered">
+  <thead>
+    <tr>
+      <th>Periodo</th>
+      <th>Total Órdenes</th>
+      <th>Total Ventas</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in data %}
+    <tr>
+      <td>{{ row.periodo }}</td>
+      <td>{{ row.total_ordenes }}</td>
+      <td>${{ "{:,.2f}".format(row.total_ventas|float) }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<canvas id="ventasChart"></canvas>
+
+<script>
+  const ctx = document.getElementById('ventasChart');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: {{ data | map(attribute='periodo') | list | safe }},
+      datasets: [{
+        label: 'Ventas Totales',
+        data: {{ data | map(attribute='total_ventas') | list | safe }},
+        borderColor: 'rgba(75, 192, 192, 1)',
+        fill: false,
+        tension: 0.1
+      }]
+    }
+  });
+</script>
+{% endblock %}
