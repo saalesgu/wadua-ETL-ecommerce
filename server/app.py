@@ -5,6 +5,9 @@ import matplotlib.pyplot as plt
 import io
 import base64
 import os 
+from dotenv import load_dotenv
+
+load_dotenv()
 
 API_BASE = os.getenv("API_BASE")
 
@@ -23,6 +26,7 @@ def index():
 
 @app.route("/ventas")
 def ventas():
+    print(API_BASE)
     data = get_data("ventas_por_periodo")
     return render_template("ventas.html", data=data)
 

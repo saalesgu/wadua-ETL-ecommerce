@@ -6,6 +6,8 @@ import os
 from datetime import datetime
 import boto3
 
+md_token = os.getenv("MD_TOKEN")
+
 log_dir = "/tmp/logs_quality"
 os.makedirs(log_dir, exist_ok=True)
 
@@ -72,7 +74,7 @@ def invoke_lambda_function(logger):
 
 def consult_db(logger):
     logger.info("Consultando la base de datos...")
-    conn = duckdb.connect("md:wadua-db?motherduck_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNhbXVlbGVzY2FsYW50ZWdAZ21haWwuY29tIiwic2Vzc2lvbiI6InNhbXVlbGVzY2FsYW50ZWcuZ21haWwuY29tIiwicGF0IjoiLUw1M1ZFSG9seXdiZ1pTTW9FN2l1bnV4ZDFxMXJ1Z0Q3cl9FekdPWFNNbyIsInVzZXJJZCI6ImVmMzgwMjllLTE2OWUtNDFlZS04NDcwLTJiZDc5NjNhOTk3OSIsImlzcyI6Im1kX3BhdCIsInJlYWRPbmx5IjpmYWxzZSwidG9rZW5UeXBlIjoicmVhZF93cml0ZSIsImlhdCI6MTc1NDkyMTA2N30.SYuDQVbZVOLo4riP8X6iTMoGkEeYlZ-nr-k2mcZg1is")
+    conn = duckdb.connect(f"md:wadua-db?motherduck_token={md_token}")
     cursor = conn.cursor()
     cursor.execute("SELECT COUNT(*) AS total_filas FROM customer")
     resultados = cursor.fetchall()
